@@ -3,6 +3,14 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.mvn/
+mvnw
+mvnw.cmd
+node_modules/
+package-lock.json
+package.json
+webpack.config.js
+webpack.generated.js
 
 ### STS ###
 .apt_generated
