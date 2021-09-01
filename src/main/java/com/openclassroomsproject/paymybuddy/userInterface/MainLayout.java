@@ -1,5 +1,6 @@
 package com.openclassroomsproject.paymybuddy.userInterface;
 
+import com.openclassroomsproject.paymybuddy.userInterface.transfert.TransferView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
