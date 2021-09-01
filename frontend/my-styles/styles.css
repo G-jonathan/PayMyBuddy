@@ -1,0 +1,8 @@
+/* Main layout */
+
+.customLink:hover {
+    color: blue;
+}
+.customLink {
+    color: black;
+}

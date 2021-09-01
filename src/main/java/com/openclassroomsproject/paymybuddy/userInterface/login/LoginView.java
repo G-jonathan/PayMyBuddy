@@ -13,15 +13,15 @@ import com.vaadin.flow.router.Route;
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
     public static final String ROUTE = "login";
-    private final LoginForm login = new LoginForm();
+    private final LoginForm loginForm = new LoginForm();
 
     public LoginView() {
         addClassName("login-view");
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
-        login.setAction("login");
-        add(new H1("P6 with Vaadin"), login);
+        loginForm.setAction("login");
+        add(new H1("P6 with Vaadin"), loginForm);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
                 .getQueryParameters()
                 .getParameters()
                 .containsKey("error")) {
-            login.setError(true);
+            loginForm.setError(true);
         }
     }
 }
