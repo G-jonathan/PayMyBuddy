@@ -1,8 +1,15 @@
 /* Main layout */
 
 .customLink:hover {
-    color: blue;
+    color: #0275D8;
 }
 .customLink {
     color: black;
+}
+
+/* Transfer view */
+
+.transfer-view {
+    padding-left: 10%;
+    padding-right: 10%;
 }
