@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface IBankAccountService {
 
-    List<BankAccount> findAllBankAccount();
+    List<BankAccount> findAllBankAccountByUserAccountEmail(String userAccountEmail);
 }

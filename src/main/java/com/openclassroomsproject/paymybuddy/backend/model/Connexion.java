@@ -19,7 +19,7 @@ public class Connexion {
     @NotEmpty
     @Size(max = 254)
     @Column(name = "user_account_email")
-    private String UserAccountEmail;
+    private String userAccountEmail;
 
     @NotNull
     @NotEmpty
@@ -32,7 +32,7 @@ public class Connexion {
     }
 
     public String getUserAccountEmail() {
-        return UserAccountEmail;
+        return userAccountEmail;
     }
 
     public String getConnexionEmail() {
@@ -44,7 +44,7 @@ public class Connexion {
     }
 
     public void setUserAccountEmail(String userAccountEmail) {
-        UserAccountEmail = userAccountEmail;
+        this.userAccountEmail = userAccountEmail;
     }
 
     public void setConnexionEmail(String connexionEmail) {

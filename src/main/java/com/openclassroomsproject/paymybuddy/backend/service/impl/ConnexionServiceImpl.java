@@ -15,7 +15,7 @@ public class ConnexionServiceImpl implements IConnexionService {
     }
 
     @Override
-    public List<Connexion> findAllConnexion() {
-        return connexionRepository.findAll();
+    public List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail) {
+        return connexionRepository.findAllConnexionByUserAccountEmail(userAccountEmail);
     }
 }
