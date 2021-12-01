@@ -18,4 +18,9 @@ public class BuddyTransactionServiceImpl implements IBuddyTransactionService {
     public List<BuddyTransaction> findAllBuddyTransaction() {
         return buddyTransactionRepository.findAll();
     }
+
+    @Override
+    public List<BuddyTransaction> findAllBuddyTransactionByUserAccountEmail(String userAccountEmail) {
+        return buddyTransactionRepository.findAllBuddyTransactionByUserAccountEmail(userAccountEmail);
+    }
 }

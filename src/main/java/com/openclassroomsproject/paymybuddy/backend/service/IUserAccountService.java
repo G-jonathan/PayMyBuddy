@@ -1,9 +1,9 @@
 package com.openclassroomsproject.paymybuddy.backend.service;
 
 import com.openclassroomsproject.paymybuddy.backend.model.UserAccount;
-import java.util.List;
+import java.util.Optional;
 
 public interface IUserAccountService {
 
-    List<UserAccount> findAllUserAccount();
+    Optional<UserAccount> findUserAccountByEmailAndPassword(String email, String password);
 }

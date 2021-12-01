@@ -15,7 +15,7 @@ public class BankAccountServiceImpl implements IBankAccountService {
     }
 
     @Override
-    public List<BankAccount> findAllBankAccount() {
-        return bankAccountRepository.findAll();
+    public List<BankAccount> findAllBankAccountByUserAccountEmail(String userAccountEmail) {
+        return bankAccountRepository.findAllBankAccountByUserAccountEmail(userAccountEmail);
     }
 }

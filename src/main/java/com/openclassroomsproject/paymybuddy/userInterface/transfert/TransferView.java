@@ -10,12 +10,15 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route (value = "transfer", layout = MainLayout.class)
+@PageTitle("Transfer page of PayMyBuddy application")
 @CssImport(value = "./my-styles/customNumberField.css", themeFor = "vaadin-number-field")
 public class TransferView extends VerticalLayout {
     private final IBuddyTransactionService buddyTransactionService;
+    Grid<BuddyTransaction> buddyTransactionGrid = new Grid<>(BuddyTransaction.class);
     final String SEND_MONEY_AND_ADD_CONNECTION_TEXT = "Send Money";
     final String SEND_MONEY_AND_ADD_CONNECTION_BUTTON_TEXT = "Add Connexion";
     final String COMBO_BOX_PLACEHOLDER = "Select A Connection";
@@ -25,6 +28,8 @@ public class TransferView extends VerticalLayout {
         this.buddyTransactionService = buddyTransactionService;
         addClassName("transfer-view");
         setSizeFull();
+        configureBuddyTransactionGrid();
+
 
         HorizontalLayout sendMoneyAndAddConnexion = new HorizontalLayout();
         stylizeSendMoneyAndAddConnexion(sendMoneyAndAddConnexion);
@@ -43,8 +48,6 @@ public class TransferView extends VerticalLayout {
         // TODO the custom numberField must be redone and implemented here
         // TODO CustomNumberField customNumberField = new CustomNumberField(0, 1, -1);
         selectAConnexionAndPay.add(selectAConnexionComboBox, buttonPay);
-        Grid<BuddyTransaction> buddyTransactionGrid = new Grid<>(BuddyTransaction.class);
-        buddyTransactionGrid.setColumns("userAccountEmail", "description", "amount");
         add(sendMoneyAndAddConnexion, selectAConnexionAndPay, buddyTransactionGrid);
         updateList();
     }
@@ -53,7 +56,7 @@ public class TransferView extends VerticalLayout {
         sendMoneyAndAddConnexion
                 .getElement()
                 .getStyle()
-                .set("width", "10s0%");
+                .set("width", "100%");
     }
 
     private void stylizeSendMoneyAndAddConnexionText(Span sendMoneyAndAddConnexionText) {
@@ -90,7 +93,6 @@ public class TransferView extends VerticalLayout {
     }
 
     private void stylizeSelectAConnexionComboBox(ComboBox<String> selectAConnexionComboBox) {
-        selectAConnexionComboBox.addClassName("test");
         selectAConnexionComboBox
                 .getElement()
                 .getStyle()
@@ -110,7 +112,11 @@ public class TransferView extends VerticalLayout {
                 .set("border-radius", "10px");
     }
 
+    public void configureBuddyTransactionGrid() {
+        buddyTransactionGrid.setColumns("userAccountEmail", "description", "amount");
+    }
+
     private void updateList() {
-        buddyTransactionService.findAllBuddyTransaction();
+        buddyTransactionGrid.setItems(buddyTransactionService.findAllBuddyTransaction());
     }
 }
