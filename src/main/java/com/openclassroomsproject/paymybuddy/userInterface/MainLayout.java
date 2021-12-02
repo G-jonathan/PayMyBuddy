@@ -1,7 +1,9 @@
 package com.openclassroomsproject.paymybuddy.userInterface;
 
+import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
 import com.openclassroomsproject.paymybuddy.userInterface.transfert.TransferView;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -13,8 +15,10 @@ import com.vaadin.flow.router.*;
 
 @CssImport("./my-styles/styles.css")
 public class MainLayout extends AppLayout {
+    private final SecurityProvider securityProvider;
 
-    public MainLayout() {
+    public MainLayout(SecurityProvider securityProvider) {
+        this.securityProvider = securityProvider;
         createHeader();
     }
 
@@ -29,7 +33,7 @@ public class MainLayout extends AppLayout {
         stylizeLink(profileLink);
         Tab contactLink = new Tab(new RouterLink("Contact", ContactView.class));
         stylizeLink(contactLink);
-        Tab logOffLink = new Tab(new RouterLink("Log off", HomeView.class));
+        Tab logOffLink = new Tab(new Button("Log out", e -> securityProvider.logout()));
         stylizeLink(logOffLink);
         HorizontalLayout linkLayout = new HorizontalLayout(homeLink, transferLink, profileLink, contactLink, logOffLink);
         stylizeLinkLayout(linkLayout);
