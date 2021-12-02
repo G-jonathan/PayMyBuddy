@@ -1,7 +1,7 @@
 CREATE TABLE public.user_Account (
     email        VARCHAR(254)         NOT NULL,
-    first_name   VARCHAR(100)         NOT NULL,
-    last_name    VARCHAR(100)         NOT NULL,
+    first_name   VARCHAR(255)         NOT NULL,
+    last_name    VARCHAR(255)         NOT NULL,
     password     VARCHAR(100)         NOT NULL,
     balance      NUMERIC(6, 2)        NOT NULL,
     is_activated BOOLEAN DEFAULT true NOT NULL,
@@ -18,8 +18,8 @@ CREATE SEQUENCE public.bank_account_id_seq;
 
 CREATE TABLE public.bank_account (
     id                 INTEGER      NOT NULL DEFAULT nextval('public.bank_account_id_seq'),
-    holder_first_name  VARCHAR(100) NOT NULL,
-    holder_last_name   VARCHAR(100) NOT NULL,
+    holder_first_name  VARCHAR(255) NOT NULL,
+    holder_last_name   VARCHAR(255) NOT NULL,
     iban               VARCHAR(31)  NOT NULL,
     bic                VARCHAR(11)  NOT NULL,
     user_account_email VARCHAR(254) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE public.bank_transaction (
     id                 INTEGER       NOT NULL DEFAULT nextval('public.bank_transaction_id_seq'),
     amount             NUMERIC(6, 2) NOT NULL,
     charges            NUMERIC(4, 2) NOT NULL,
-    description        VARCHAR(100)  NOT NULL,
+    description        VARCHAR(255)  NOT NULL,
     date               DATE          NOT NULL,
     transaction_type   VARCHAR(10)   NOT NULL,
     bank_account_id    INTEGER       NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE public.buddy_transaction (
     id                 INTEGER       NOT NULL DEFAULT nextval('public.buddy_transaction_id_seq'),
     amount             NUMERIC(6, 2) NOT NULL,
     charges            NUMERIC(4, 2) NOT NULL,
-    description        VARCHAR(100)  NOT NULL,
+    description        VARCHAR(255)  NOT NULL,
     date               DATE          NOT NULL,
     user_account_email VARCHAR(254)  NOT NULL,
     connexion_id       INTEGER       NOT NULL,

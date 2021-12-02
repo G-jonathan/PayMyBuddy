@@ -5,5 +5,8 @@ import java.util.List;
 
 public interface IBankTransactionService {
 
+    void addBankTransaction(BankTransaction bankTransaction);
+
     List<BankTransaction> findAllBankTransactionByUserAccountEmail(String userAccountEmail);
+
 }

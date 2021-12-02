@@ -15,7 +15,22 @@ public class ConnexionServiceImpl implements IConnexionService {
     }
 
     @Override
+    public void addConnection(Connexion connexion) {
+        connexionRepository.save(connexion);
+    }
+
+    @Override
     public List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail) {
         return connexionRepository.findAllConnexionByUserAccountEmail(userAccountEmail);
+    }
+
+    @Override
+    public void updateConnexion(Connexion connexion) {
+        connexionRepository.save(connexion);
+    }
+
+    @Override
+    public void deleteConnexion(Connexion connexion) {
+        connexionRepository.deleteById(connexion.getId());
     }
 }
