@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface BuddyTransactionRepository extends JpaRepository<BuddyTransaction, Integer> {
 
-    List<BuddyTransaction> findAllBuddyTransactionByUserAccountEmail(String userAccountEmail);
+    List<BuddyTransaction> findAllUserBuddyTransactionsByUserAccountEmail(String userAccountEmail);
 }

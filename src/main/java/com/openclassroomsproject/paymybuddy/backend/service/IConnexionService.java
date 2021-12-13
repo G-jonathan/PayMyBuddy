@@ -7,7 +7,9 @@ public interface IConnexionService {
 
     void addConnection(Connexion connexion);
 
-    List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail);
+    String findConnexionEmailById(int id);
+
+    List<String> findAllConnexionByUserAccountEmail();
 
     void updateConnexion(Connexion connexion);
 

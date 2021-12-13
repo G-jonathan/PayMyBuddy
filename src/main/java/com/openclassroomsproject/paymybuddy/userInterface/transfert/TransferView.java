@@ -1,8 +1,8 @@
 package com.openclassroomsproject.paymybuddy.userInterface.transfert;
 
-import com.openclassroomsproject.paymybuddy.backend.model.BuddyTransaction;
+import com.openclassroomsproject.paymybuddy.backend.model.VisibleBuddyTransaction;
 import com.openclassroomsproject.paymybuddy.backend.service.IBuddyTransactionService;
-import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
+import com.openclassroomsproject.paymybuddy.backend.service.IConnexionService;
 import com.openclassroomsproject.paymybuddy.userInterface.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -20,19 +20,21 @@ import com.vaadin.flow.router.Route;
 public class TransferView extends VerticalLayout {
 
     private final IBuddyTransactionService buddyTransactionService;
-    Grid<BuddyTransaction> buddyTransactionGrid = new Grid<>(BuddyTransaction.class);
+    private final IConnexionService connexionService;
+    Grid<VisibleBuddyTransaction> buddyTransactionGrid = new Grid<>(VisibleBuddyTransaction.class);
+    ComboBox<String> selectAConnexionComboBox = new ComboBox<>();
     final String SEND_MONEY_AND_ADD_CONNECTION_TEXT = "Send Money";
     final String SEND_MONEY_AND_ADD_CONNECTION_BUTTON_TEXT = "Add Connexion";
     final String COMBO_BOX_PLACEHOLDER = "Select A Connection";
     final String BUTTON_PAY_TEXT = "Pay";
 
-    public TransferView(IBuddyTransactionService buddyTransactionService) {
+    public TransferView(IBuddyTransactionService buddyTransactionService, IConnexionService connexionService) {
         this.buddyTransactionService = buddyTransactionService;
+        this.connexionService = connexionService;
         addClassName("transfer-view");
         setSizeFull();
         configureBuddyTransactionGrid();
-
-
+        configureSelectAConnexionComboBox();
         HorizontalLayout sendMoneyAndAddConnexion = new HorizontalLayout();
         stylizeSendMoneyAndAddConnexion(sendMoneyAndAddConnexion);
         Span sendMoneyAndAddConnexionText = new Span(SEND_MONEY_AND_ADD_CONNECTION_TEXT);
@@ -42,16 +44,14 @@ public class TransferView extends VerticalLayout {
         sendMoneyAndAddConnexion.add(sendMoneyAndAddConnexionText, sendMoneyAndAddConnexionButton);
         HorizontalLayout selectAConnexionAndPay = new HorizontalLayout();
         stylizeSelectAConnexionAndPay(selectAConnexionAndPay);
-        ComboBox<String> selectAConnexionComboBox = new ComboBox<>();
-        selectAConnexionComboBox.setPlaceholder(COMBO_BOX_PLACEHOLDER);
-        stylizeSelectAConnexionComboBox(selectAConnexionComboBox);
         Button buttonPay = new Button(BUTTON_PAY_TEXT);
         stylizeButtonPay(buttonPay);
         // TODO the custom numberField must be redone and implemented here
         // TODO CustomNumberField customNumberField = new CustomNumberField(0, 1, -1);
         selectAConnexionAndPay.add(selectAConnexionComboBox, buttonPay);
         add(sendMoneyAndAddConnexion, selectAConnexionAndPay, buddyTransactionGrid);
-        updateList();
+        updateTransactionsGrid();
+        updateComboBox();
     }
 
     private void stylizeSendMoneyAndAddConnexion(HorizontalLayout sendMoneyAndAddConnexion) {
@@ -94,14 +94,6 @@ public class TransferView extends VerticalLayout {
                 .set("padding-bottom", "3%");
     }
 
-    private void stylizeSelectAConnexionComboBox(ComboBox<String> selectAConnexionComboBox) {
-        selectAConnexionComboBox
-                .getElement()
-                .getStyle()
-                .set("height", "100%")
-                .set("padding-top", "5%");
-    }
-
     private void stylizeButtonPay(Button buttonPay) {
         buttonPay
                 .getElement()
@@ -115,10 +107,24 @@ public class TransferView extends VerticalLayout {
     }
 
     public void configureBuddyTransactionGrid() {
-        buddyTransactionGrid.setColumns("userAccountEmail", "description", "amount");
+        buddyTransactionGrid.setColumns("connexionEmail", "amount", "description", "date");
     }
 
-    private void updateList() {
-        buddyTransactionGrid.setItems(buddyTransactionService.findAllBuddyTransactionByUserAccountEmail());
+    public void configureSelectAConnexionComboBox() {
+        selectAConnexionComboBox
+                .setPlaceholder(COMBO_BOX_PLACEHOLDER);
+        selectAConnexionComboBox
+                .getElement()
+                .getStyle()
+                .set("height", "100%")
+                .set("padding-top", "5%");
+    }
+
+    private void updateTransactionsGrid() {
+        buddyTransactionGrid.setItems(buddyTransactionService.findAllUserBuddyTransactions());
+    }
+
+    private void updateComboBox() {
+        selectAConnexionComboBox.setItems(connexionService.findAllConnexionByUserAccountEmail());
     }
 }
