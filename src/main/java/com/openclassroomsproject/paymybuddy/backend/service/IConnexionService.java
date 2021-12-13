@@ -5,5 +5,11 @@ import java.util.List;
 
 public interface IConnexionService {
 
+    void addConnection(Connexion connexion);
+
     List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail);
+
+    void updateConnexion(Connexion connexion);
+
+    void deleteConnexion(Connexion connexion);
 }

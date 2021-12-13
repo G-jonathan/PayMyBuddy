@@ -2,6 +2,7 @@ package com.openclassroomsproject.paymybuddy.userInterface.transfert;
 
 import com.openclassroomsproject.paymybuddy.backend.model.BuddyTransaction;
 import com.openclassroomsproject.paymybuddy.backend.service.IBuddyTransactionService;
+import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
 import com.openclassroomsproject.paymybuddy.userInterface.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -17,6 +18,7 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Transfer page of PayMyBuddy application")
 @CssImport(value = "./my-styles/customNumberField.css", themeFor = "vaadin-number-field")
 public class TransferView extends VerticalLayout {
+
     private final IBuddyTransactionService buddyTransactionService;
     Grid<BuddyTransaction> buddyTransactionGrid = new Grid<>(BuddyTransaction.class);
     final String SEND_MONEY_AND_ADD_CONNECTION_TEXT = "Send Money";
@@ -117,6 +119,6 @@ public class TransferView extends VerticalLayout {
     }
 
     private void updateList() {
-        buddyTransactionGrid.setItems(buddyTransactionService.findAllBuddyTransaction());
+        buddyTransactionGrid.setItems(buddyTransactionService.findAllBuddyTransactionByUserAccountEmail());
     }
 }

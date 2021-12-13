@@ -15,6 +15,11 @@ public class BankTransactionServiceImpl implements IBankTransactionService {
     }
 
     @Override
+    public void addBankTransaction(BankTransaction bankTransaction) {
+        bankTransactionRepository.save(bankTransaction);
+    }
+
+    @Override
     public List<BankTransaction> findAllBankTransactionByUserAccountEmail(String userAccountEmail) {
         return bankTransactionRepository.findAllBankTransactionByUserAccountEmail(userAccountEmail);
     }

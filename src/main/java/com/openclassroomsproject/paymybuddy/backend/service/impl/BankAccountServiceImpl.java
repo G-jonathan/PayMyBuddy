@@ -15,7 +15,22 @@ public class BankAccountServiceImpl implements IBankAccountService {
     }
 
     @Override
-    public List<BankAccount> findAllBankAccountByUserAccountEmail(String userAccountEmail) {
+    public void addBankAccount(BankAccount bankAccount) {
+        bankAccountRepository.save(bankAccount);
+    }
+
+    @Override
+    public List<BankAccount> findBankAccountsByUserAccountEmail(String userAccountEmail) {
         return bankAccountRepository.findAllBankAccountByUserAccountEmail(userAccountEmail);
+    }
+
+    @Override
+    public void updateBankAccount(BankAccount bankAccount) {
+        bankAccountRepository.save(bankAccount);
+    }
+
+    @Override
+    public void deleteABankAccount(BankAccount bankAccount) {
+        bankAccountRepository.deleteById(bankAccount.getId());
     }
 }

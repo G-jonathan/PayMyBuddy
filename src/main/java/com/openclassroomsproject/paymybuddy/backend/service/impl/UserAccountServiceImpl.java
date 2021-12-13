@@ -15,7 +15,23 @@ public class UserAccountServiceImpl implements IUserAccountService {
     }
 
     @Override
+    public void createUserAccount(UserAccount userAccount) {
+        userAccountRepository.save(userAccount);
+    }
+
+    @Override
     public Optional<UserAccount> findUserAccountByEmailAndPassword(String email, String password) {
         return userAccountRepository.findUserAccountByEmailAndPassword(email, password);
+    }
+
+    @Override
+    public void updateUserAccount(UserAccount userAccount) {
+        userAccountRepository.save(userAccount);
+    }
+
+    @Override
+    //TODO CUSTOM METHOD REPO
+    public void deleteUserAccount(UserAccount userAccount) {
+        userAccountRepository.deleteById(userAccount.getEmail());
     }
 }

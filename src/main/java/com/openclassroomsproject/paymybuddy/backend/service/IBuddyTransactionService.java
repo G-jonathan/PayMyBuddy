@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface IBuddyTransactionService {
 
-    List<BuddyTransaction> findAllBuddyTransaction();
-    List<BuddyTransaction> findAllBuddyTransactionByUserAccountEmail(String userAccountEmail);
+    void addBuddyTransaction(BuddyTransaction buddyTransaction);
+
+    List<BuddyTransaction> findAllBuddyTransactionByUserAccountEmail();
 }
