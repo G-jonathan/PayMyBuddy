@@ -12,4 +12,6 @@ public interface IUserAccountService {
     void updateUserAccount(UserAccount userAccount);
 
     void deleteUserAccount(UserAccount userAccount);
+
+    boolean emailUserAlreadyExist(String email);
 }
