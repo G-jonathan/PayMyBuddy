@@ -7,4 +7,6 @@ import java.util.List;
 public interface ConnexionRepository extends JpaRepository<Connexion, Integer> {
 
     List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail);
+
+    Connexion findConnexionById(int id);
 }

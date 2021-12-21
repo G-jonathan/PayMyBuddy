@@ -3,14 +3,18 @@ package com.openclassroomsproject.paymybuddy.backend.service.impl;
 import com.openclassroomsproject.paymybuddy.backend.model.Connexion;
 import com.openclassroomsproject.paymybuddy.backend.repository.ConnexionRepository;
 import com.openclassroomsproject.paymybuddy.backend.service.IConnexionService;
+import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ConnexionServiceImpl implements IConnexionService {
+    private final SecurityProvider securityProvider;
     private final ConnexionRepository connexionRepository;
 
-    public ConnexionServiceImpl(ConnexionRepository connexionRepository) {
+    public ConnexionServiceImpl(SecurityProvider securityProvider, ConnexionRepository connexionRepository) {
+        this.securityProvider = securityProvider;
         this.connexionRepository = connexionRepository;
     }
 
@@ -20,8 +24,20 @@ public class ConnexionServiceImpl implements IConnexionService {
     }
 
     @Override
-    public List<Connexion> findAllConnexionByUserAccountEmail(String userAccountEmail) {
-        return connexionRepository.findAllConnexionByUserAccountEmail(userAccountEmail);
+    public String findConnexionEmailById(int id) {
+        Connexion connexion = connexionRepository.findConnexionById(id);
+        return connexion.getConnexionEmail();
+    }
+
+    @Override
+    public List<String> findAllConnexionByUserAccountEmail() {
+        String email = securityProvider.getAuthenticatedUser().getUsername();
+        List<Connexion> connexionList = connexionRepository.findAllConnexionByUserAccountEmail(email);
+        List<String> emailConnectionList = new ArrayList<>();
+        for (Connexion connexion : connexionList) {
+            emailConnectionList.add(connexion.getConnexionEmail());
+        }
+        return emailConnectionList;
     }
 
     @Override
