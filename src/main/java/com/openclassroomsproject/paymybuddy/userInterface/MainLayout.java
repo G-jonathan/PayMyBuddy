@@ -73,7 +73,7 @@ public class MainLayout extends AppLayout {
                 .set("padding-bottom", "0.8%")
                 .set("margin-top", "0")
                 .set("color", "blue")
-                .set("background-color", "lightgray");
+                .set("background-color", "#F3F5F7");
     }
 
     private void stylizeLinkLayout(HorizontalLayout linkLayout) {

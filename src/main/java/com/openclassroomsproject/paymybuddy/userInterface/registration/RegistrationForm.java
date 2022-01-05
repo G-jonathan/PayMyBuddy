@@ -2,12 +2,16 @@ package com.openclassroomsproject.paymybuddy.userInterface.registration;
 
 import com.openclassroomsproject.paymybuddy.backend.model.UserAccount;
 import com.openclassroomsproject.paymybuddy.backend.service.IUserAccountService;
+import com.openclassroomsproject.paymybuddy.userInterface.login.LoginView;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -15,6 +19,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.data.binder.*;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 
 @PageTitle("Registration")
 @Route(value = "registration")
@@ -27,7 +32,11 @@ public class RegistrationForm extends VerticalLayout {
 
     public RegistrationForm(IUserAccountService userAccountService) {
         this.userAccountService = userAccountService;
-        H3 title = new H3("Registration form");
+        setSizeFull();
+        setAlignItems(Alignment.CENTER);
+        setJustifyContentMode(JustifyContentMode.CENTER);
+        H1 title = new H1("PAY MY BUDDY");
+        H3 subTitle = new H3("Registration form");
         TextField firstnameField = new TextField("First Name");
         TextField lastNameField = new TextField("Last Name");
         EmailField emailField = new EmailField("Email");
@@ -36,7 +45,8 @@ public class RegistrationForm extends VerticalLayout {
         Span errorMessage = new Span();
         configureErrorMessage(errorMessage);
         Button submitButton = new Button("Submit");
-        FormLayout formLayout = new FormLayout(title, firstnameField, lastNameField, emailField, mainPasswordField, repeatPasswordField, errorMessage, submitButton);
+        Tab loginPageLink = new Tab(new RouterLink("Return to login page ", LoginView.class));
+        FormLayout formLayout = new FormLayout(title, subTitle, firstnameField, lastNameField, emailField, mainPasswordField, repeatPasswordField, errorMessage, submitButton, loginPageLink);
         configureFormLayout(formLayout);
         add(formLayout);
         validationBinder = new Binder<>(UserAccount.class);
@@ -87,7 +97,7 @@ public class RegistrationForm extends VerticalLayout {
     private void showSuccess(UserAccount userAccountBean) {
         Notification notification = Notification.show("Account successfully created. Welcome " + userAccountBean.getFirstName() + " " + userAccountBean.getLastName() + " !");
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        // TODO REDIRECT TO ANOTHER VIEW
+        UI.getCurrent().navigate("login");
     }
 
     private void configureFormLayout(FormLayout formLayout) {
