@@ -21,7 +21,13 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(JustifyContentMode.CENTER);
         loginForm.setAction("login");
         Tab registrationLink = new Tab(new RouterLink("Create an account ", RegistrationForm.class));
-        add(new H1("P6 with Vaadin"), loginForm, registrationLink);
+        H1 title = new H1("PAY MY BUDDY");
+        title.getElement().getStyle()
+                .set("background-color", "#5CB85C")
+                .set("padding", "0.5%")
+                .set("border-radius", "10px")
+                .set("color", "white");
+        add(title, loginForm, registrationLink);
     }
 
     @Override

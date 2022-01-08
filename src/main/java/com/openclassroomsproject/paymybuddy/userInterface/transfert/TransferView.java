@@ -8,22 +8,28 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.util.List;
 
 @Route (value = "transfer", layout = MainLayout.class)
 @PageTitle("Transfer page of PayMyBuddy application")
 @CssImport(value = "./my-styles/customNumberField.css", themeFor = "vaadin-number-field")
+@CssImport(value = "./my-styles/customGridStyle.css", themeFor = "vaadin-grid")
+@CssImport(value = "./my-styles/customComboBoxStyle.css", themeFor = "vaadin-combo-box")
 public class TransferView extends VerticalLayout {
 
     private final IBuddyTransactionService buddyTransactionService;
     private final IConnexionService connexionService;
-    Grid<VisibleBuddyTransaction> buddyTransactionGrid = new Grid<>(VisibleBuddyTransaction.class);
+    Grid<VisibleBuddyTransaction> buddyTransactionGrid = new Grid<>(VisibleBuddyTransaction.class, false);
     ComboBox<String> selectAConnexionComboBox = new ComboBox<>();
     final String SEND_MONEY_AND_ADD_CONNECTION_TEXT = "Send Money";
+    final String MY_TRANSACTION_TEXT = "My Transactions";
     final String SEND_MONEY_AND_ADD_CONNECTION_BUTTON_TEXT = "Add Connexion";
     final String COMBO_BOX_PLACEHOLDER = "Select A Connection";
     final String BUTTON_PAY_TEXT = "Pay";
@@ -46,10 +52,12 @@ public class TransferView extends VerticalLayout {
         stylizeSelectAConnexionAndPay(selectAConnexionAndPay);
         Button buttonPay = new Button(BUTTON_PAY_TEXT);
         stylizeButtonPay(buttonPay);
-        // TODO the custom numberField must be redone and implemented here
-        // TODO CustomNumberField customNumberField = new CustomNumberField(0, 1, -1);
-        selectAConnexionAndPay.add(selectAConnexionComboBox, buttonPay);
-        add(sendMoneyAndAddConnexion, selectAConnexionAndPay, buddyTransactionGrid);
+        Span myTransactionsSpan = new Span(MY_TRANSACTION_TEXT);
+        stylizeMyTransactions(myTransactionsSpan);
+        IntegerField integerField = new IntegerField();
+        configureAndStylizeIntegerField(integerField);
+        selectAConnexionAndPay.add(selectAConnexionComboBox,integerField, buttonPay);
+        add(sendMoneyAndAddConnexion, selectAConnexionAndPay, myTransactionsSpan, buddyTransactionGrid);
         updateTransactionsGrid();
         updateComboBox();
     }
@@ -85,7 +93,7 @@ public class TransferView extends VerticalLayout {
         selectAConnexionAndPay
                 .getElement()
                 .getStyle()
-                .set("background-color", "#F5F5F5")
+                .set("background-color", "#F3F5F7")
                 .set("width", "100%")
                 .set("justify-content", "center")
                 .set("align-items", "center")
@@ -106,8 +114,52 @@ public class TransferView extends VerticalLayout {
                 .set("border-radius", "10px");
     }
 
+    private void stylizeMyTransactions(Span myTransactionsSpan) {
+        myTransactionsSpan
+                .getStyle()
+                .set("font-size", "x-large")
+                .set("align-self", "start");
+    }
+
+    public void configureAndStylizeIntegerField(IntegerField integerField) {
+        integerField.setStep(1);
+        integerField.setValue(0);
+        integerField.setHasControls(true);
+        integerField.setMin(0);
+        integerField.setMax(100);
+        integerField
+                .getElement()
+                .getStyle()
+                .set("background-color", "white")
+                .set("border", "2px solid black")
+                .set("padding-top", "0.5%")
+                .set("padding-bottom", "0.5%");
+    }
+
     public void configureBuddyTransactionGrid() {
-        buddyTransactionGrid.setColumns("connexionEmail", "amount", "description", "date");
+        Span firstSpan = new Span("Connexions");
+        firstSpan
+                .getStyle()
+                .set("color", "white")
+                .set("font-size", "large");
+        Span secondSpan = new Span("Description");
+        secondSpan
+                .getStyle()
+                .set("color", "white")
+                .set("font-size", "large");
+        Span thirdSpan = new Span("Amount");
+        thirdSpan
+                .getStyle()
+                .set("color", "white")
+                .set("font-size", "large");
+        buddyTransactionGrid
+                .getStyle()
+                .set("border", "2px solid black")
+                .set("align-items", "center");
+        buddyTransactionGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
+        buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getConnexionEmail).setHeader(firstSpan);
+        buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getDescription).setHeader(secondSpan);
+        buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getAmount).setHeader(thirdSpan);
     }
 
     public void configureSelectAConnexionComboBox() {
@@ -116,12 +168,14 @@ public class TransferView extends VerticalLayout {
         selectAConnexionComboBox
                 .getElement()
                 .getStyle()
-                .set("height", "100%")
-                .set("padding-top", "5%");
+                .set("border", "2px solid black")
+                .set("padding-top", "0.20%")
+                .set("padding-bottom", "0.25%");
     }
 
     private void updateTransactionsGrid() {
-        buddyTransactionGrid.setItems(buddyTransactionService.findAllUserBuddyTransactions());
+        List<VisibleBuddyTransaction> visibleBuddyTransactionList =buddyTransactionService.findAllUserBuddyTransactions();
+        buddyTransactionGrid.setItems(visibleBuddyTransactionList);
     }
 
     private void updateComboBox() {
