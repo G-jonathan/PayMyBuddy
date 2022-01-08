@@ -79,7 +79,7 @@ public class RegistrationForm extends VerticalLayout {
         }
     }
 
-    private ValidationResult passwordValidator(String mainPassword, ValueContext ctx) {
+    private ValidationResult passwordValidator(String mainPassword, ValueContext context) {
         if (mainPassword == null || mainPassword.length() > 100 || mainPassword.length() < 10) {
             return ValidationResult.error("The password must be between 10 and 100 characters");
         }

@@ -1,4 +1,8 @@
 [part~="header-cell"] {
     background-color: #5CB85C;
+    height: 100px;
+}
 
+[part~="body-cell"] {
+    height: 100px;
 }

@@ -39,7 +39,7 @@ public class MainLayout extends AppLayout {
         stylizeLinkLayout(linkLayout);
         HorizontalLayout titleAndLinksLayout = new HorizontalLayout(title, linkLayout);
         stylizeTitleAndLinks(titleAndLinksLayout);
-        Span pathLayout = new Span("Home /");
+        Span pathLayout = new Span("Home /     ");
         stylizePath(pathLayout);
         VerticalLayout header = new VerticalLayout(titleAndLinksLayout, pathLayout);
         stylizeHeader(header);

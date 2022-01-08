@@ -7,6 +7,7 @@ import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvi
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConnexionServiceImpl implements IConnexionService {
@@ -19,7 +20,11 @@ public class ConnexionServiceImpl implements IConnexionService {
     }
 
     @Override
-    public void addConnection(Connexion connexion) {
+    public void addConnection(String emailConnexion) {
+        Connexion connexion = new Connexion();
+        String email = securityProvider.getAuthenticatedUser().getUsername();
+        connexion.setConnexionEmail(emailConnexion);
+        connexion.setUserAccountEmail(email);
         connexionRepository.save(connexion);
     }
 
@@ -27,6 +32,19 @@ public class ConnexionServiceImpl implements IConnexionService {
     public String findConnexionEmailById(int id) {
         Connexion connexion = connexionRepository.findConnexionById(id);
         return connexion.getConnexionEmail();
+    }
+
+    @Override
+    public int findConnexionIdByUserAccountEmailAndConnexionEmail(String userAccountEmail, String connexionEmail) {
+        Connexion connection = connexionRepository.findConnexionByUserAccountEmailAndConnexionEmail(userAccountEmail, connexionEmail);
+        return connection.getId();
+    }
+
+    @Override
+    public boolean findConnexionByUserAccountEmailAndConnexionEmail(String connexionEmail) {
+        String email = securityProvider.getAuthenticatedUser().getUsername();
+        Optional<Connexion> connection = connexionRepository.findAConnexionByUserAccountEmailAndConnexionEmail(email, connexionEmail);
+        return connection.isPresent();
     }
 
     @Override

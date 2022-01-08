@@ -21,7 +21,7 @@ INSERT INTO buddy_transaction (amount, charges, description, date, user_account_
 VALUES (10, 0, 'payment of 10 euros to user2FirstName user2LastName', CURRENT_DATE, 'user1@email.com',
         (SELECT id from connexion WHERE user_account_email = 'user1@email.com' AND connexion_email = 'user2@email.com')),
        (5, 0, 'payment of 5 euros to user3FirstName user3LastName', CURRENT_DATE, 'user1@email.com',
-        (SELECT id from connexion WHERE user_account_email = 'user1@email.com' AND connexion_email = 'user3@email.com'))
+        (SELECT id from connexion WHERE user_account_email = 'user1@email.com' AND connexion_email = 'user3@email.com')),
        (25, 0, 'payment of 25 euros to user3FirstName user3LastName', CURRENT_DATE, 'user2@email.com',
         (SELECT id from connexion WHERE user_account_email = 'user2@email.com' AND connexion_email = 'user3@email.com'))
 ;
