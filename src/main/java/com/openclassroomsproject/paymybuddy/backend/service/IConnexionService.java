@@ -5,7 +5,11 @@ import java.util.List;
 
 public interface IConnexionService {
 
-    void addConnection(Connexion connexion);
+    boolean findConnexionByUserAccountEmailAndConnexionEmail(String connexionEmail);
+
+    void addConnection(String emailConnexion);
+
+    int findConnexionIdByUserAccountEmailAndConnexionEmail(String userAccountEmail, String connexionEmail);
 
     String findConnexionEmailById(int id);
 

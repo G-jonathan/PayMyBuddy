@@ -15,6 +15,7 @@ public class BankTransaction {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotNull

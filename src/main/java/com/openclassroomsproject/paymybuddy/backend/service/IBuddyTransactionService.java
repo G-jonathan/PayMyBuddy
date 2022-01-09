@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface IBuddyTransactionService {
 
-    void addBuddyTransaction(BuddyTransaction buddyTransaction);
+    public void deleteBuddyTransaction(BuddyTransaction buddyTransaction);
+
+    boolean addBuddyTransaction(VisibleBuddyTransaction visibleBuddyTransaction);
 
     List<VisibleBuddyTransaction> findAllUserBuddyTransactions();
 }
