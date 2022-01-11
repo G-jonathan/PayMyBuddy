@@ -1,11 +1,13 @@
 package com.openclassroomsproject.paymybuddy.backend.service.impl;
 
 import com.openclassroomsproject.paymybuddy.backend.model.BuddyTransaction;
+import com.openclassroomsproject.paymybuddy.backend.model.UserAccount;
 import com.openclassroomsproject.paymybuddy.backend.model.VisibleBuddyTransaction;
 import com.openclassroomsproject.paymybuddy.backend.repository.BuddyTransactionRepository;
 import com.openclassroomsproject.paymybuddy.backend.service.IBuddyTransactionService;
 import com.openclassroomsproject.paymybuddy.backend.service.IConnexionService;
 import com.openclassroomsproject.paymybuddy.backend.service.IUserAccountService;
+import com.openclassroomsproject.paymybuddy.backend.service.ServiceUtils;
 import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -28,29 +30,38 @@ public class BuddyTransactionServiceImpl implements IBuddyTransactionService {
 
     @Override
     public boolean addBuddyTransaction(VisibleBuddyTransaction visibleBuddyTransaction) {
-        boolean updateAccountsAmount = userAccountService.updateUsersAccountsBeforeSavingTheTransaction(visibleBuddyTransaction, false);
-        if (updateAccountsAmount) {
-            try {
-                BuddyTransaction buddyTransaction = new BuddyTransaction();
-                String userAccountEmail = securityProvider.getAuthenticatedUser().getUsername();
-                double amount = visibleBuddyTransaction.getAmount();
-                String connexionEmail = visibleBuddyTransaction.getConnexionEmail();
-                int connexionId = connexionService.findConnexionIdByUserAccountEmailAndConnexionEmail(userAccountEmail, connexionEmail);
-                buddyTransaction.setAmount(amount);
-                buddyTransaction.setDate(visibleBuddyTransaction.getDate());
-                buddyTransaction.setDescription("Payment of " + amount + " euros to " + connexionEmail);
-                buddyTransaction.setConnexionId(connexionId);
-                buddyTransaction.setUserAccountEmail(userAccountEmail);
-                buddyTransaction.setCharges(0);
-                buddyTransactionRepository.save(buddyTransaction);
-            } catch (Exception e) {
-                userAccountService.updateUsersAccountsBeforeSavingTheTransaction(visibleBuddyTransaction, true);
-                return false;
-            }
-            return true;
-        } else {
+        String transmitterEmail = securityProvider.getAuthenticatedUser().getUsername();
+        String beneficiaryEmail = visibleBuddyTransaction.getConnexionEmail();
+        UserAccount transmitterAccount = userAccountService.findUserAccountByEmail(transmitterEmail);
+        UserAccount beneficiaryAccount = userAccountService.findUserAccountByEmail(beneficiaryEmail);
+        double transmitterAmountBeforeModification = transmitterAccount.getBalance();
+        double beneficiaryAmountBeforeModification = beneficiaryAccount.getBalance();
+        ServiceUtils utils = new ServiceUtils();
+        double amountWithoutCharges = visibleBuddyTransaction.getAmount();
+        double charges = utils.calculateCharges(amountWithoutCharges);
+        double amountWithCharges = utils.calculateFinalAmountWithCharges(amountWithoutCharges);
+        if (!userAccountService.isUserBalanceSufficient(amountWithCharges) || amountWithCharges == 0) {
             return false;
         }
+        transmitterAccount.setBalance(transmitterAmountBeforeModification - amountWithCharges);
+        beneficiaryAccount.setBalance(beneficiaryAmountBeforeModification + amountWithoutCharges);
+        try {
+            userAccountService.updateUserAccount(transmitterAccount);
+            userAccountService.updateUserAccount(beneficiaryAccount);
+            userAccountService.adminAccountProvision(charges);
+        } catch (Exception e) {
+            return false;
+        }
+        BuddyTransaction buddyTransaction = new BuddyTransaction();
+        int connexionId = connexionService.findConnexionIdByUserAccountEmailAndConnexionEmail(transmitterEmail, beneficiaryEmail);
+        buddyTransaction.setUserAccountEmail(transmitterEmail);
+        buddyTransaction.setConnexionId(connexionId);
+        buddyTransaction.setDate(visibleBuddyTransaction.getDate());
+        buddyTransaction.setAmount(amountWithoutCharges);
+        buddyTransaction.setDescription("Payment of " + amountWithoutCharges + " euros to " + beneficiaryEmail);
+        buddyTransaction.setCharges(charges);
+        buddyTransactionRepository.save(buddyTransaction);
+        return true;
     }
 
     @Override
@@ -60,6 +71,7 @@ public class BuddyTransactionServiceImpl implements IBuddyTransactionService {
         List<VisibleBuddyTransaction> visibleBuddyTransactionList = new ArrayList<>();
         for (BuddyTransaction buddyTransaction : buddyTransactionList) {
             VisibleBuddyTransaction visibleBuddyTransaction = new VisibleBuddyTransaction();
+            visibleBuddyTransaction.setCharges(buddyTransaction.getCharges());
             visibleBuddyTransaction.setId(buddyTransaction.getId());
             visibleBuddyTransaction.setAmount(buddyTransaction.getAmount());
             visibleBuddyTransaction.setDescription(buddyTransaction.getDescription());

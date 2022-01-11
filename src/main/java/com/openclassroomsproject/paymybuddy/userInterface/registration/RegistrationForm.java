@@ -1,6 +1,7 @@
 package com.openclassroomsproject.paymybuddy.userInterface.registration;
 
 import com.openclassroomsproject.paymybuddy.backend.model.UserAccount;
+import com.openclassroomsproject.paymybuddy.backend.service.IAuthoritiesService;
 import com.openclassroomsproject.paymybuddy.backend.service.IUserAccountService;
 import com.openclassroomsproject.paymybuddy.userInterface.login.LoginView;
 import com.vaadin.flow.component.UI;
@@ -26,16 +27,22 @@ import com.vaadin.flow.router.RouterLink;
 public class RegistrationForm extends VerticalLayout {
     private boolean enablePasswordValidation;
     private final IUserAccountService userAccountService;
+    private final IAuthoritiesService authoritiesService;
     private Binder<UserAccount> validationBinder;
     private final PasswordField mainPasswordField;
     private final PasswordField repeatPasswordField;
 
-    public RegistrationForm(IUserAccountService userAccountService) {
+    public RegistrationForm(IUserAccountService userAccountService, IAuthoritiesService authoritiesService) {
         this.userAccountService = userAccountService;
+        this.authoritiesService = authoritiesService;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
         H1 title = new H1("PAY MY BUDDY");
+        title.getElement().getStyle()
+                .set("background-color", "#5CB85C")
+                .set("border-radius", "10px")
+                .set("color", "white");
         H3 subTitle = new H3("Registration form");
         TextField firstnameField = new TextField("First Name");
         TextField lastNameField = new TextField("Last Name");
@@ -62,8 +69,11 @@ public class RegistrationForm extends VerticalLayout {
             try {
                 UserAccount userAccountBean = new UserAccount();
                 validationBinder.writeBean(userAccountBean);
-                userAccountService.createUserAccount(userAccountBean);
-                showSuccess(userAccountBean);
+                boolean response = userAccountService.createUserAccount(userAccountBean);
+                if (response) {
+                    this.authoritiesService.createRoleUser(userAccountBean.getEmail());
+                    showSuccess(userAccountBean);
+                }
             } catch (ValidationException validationException) {
                 validationException.printStackTrace();
             }

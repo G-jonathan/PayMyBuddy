@@ -1,6 +1,7 @@
 package com.openclassroomsproject.paymybuddy.userInterface;
 
 import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
+import com.openclassroomsproject.paymybuddy.userInterface.bankAccount.BankAccountView;
 import com.openclassroomsproject.paymybuddy.userInterface.transfert.TransferView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
@@ -29,13 +30,15 @@ public class MainLayout extends AppLayout {
         stylizeLink(homeLink);
         Tab transferLink = new Tab(new RouterLink("Transfer", TransferView.class));
         stylizeLink(transferLink);
+        Tab bankLink = new Tab(new RouterLink("Bank", BankAccountView.class));
+        stylizeLink(bankLink);
         Tab profileLink = new Tab(new RouterLink("Profile", ProfileView.class));
         stylizeLink(profileLink);
         Tab contactLink = new Tab(new RouterLink("Contact", ContactView.class));
         stylizeLink(contactLink);
         Tab logOffLink = new Tab(new Button("Log out", e -> securityProvider.logout()));
         stylizeLink(logOffLink);
-        HorizontalLayout linkLayout = new HorizontalLayout(homeLink, transferLink, profileLink, contactLink, logOffLink);
+        HorizontalLayout linkLayout = new HorizontalLayout(homeLink, transferLink, bankLink, profileLink, contactLink, logOffLink);
         stylizeLinkLayout(linkLayout);
         HorizontalLayout titleAndLinksLayout = new HorizontalLayout(title, linkLayout);
         stylizeTitleAndLinks(titleAndLinksLayout);

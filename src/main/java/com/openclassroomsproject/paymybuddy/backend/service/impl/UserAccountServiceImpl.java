@@ -1,8 +1,8 @@
 package com.openclassroomsproject.paymybuddy.backend.service.impl;
 
 import com.openclassroomsproject.paymybuddy.backend.model.UserAccount;
-import com.openclassroomsproject.paymybuddy.backend.model.VisibleBuddyTransaction;
 import com.openclassroomsproject.paymybuddy.backend.repository.UserAccountRepository;
+import com.openclassroomsproject.paymybuddy.backend.service.IAuthoritiesService;
 import com.openclassroomsproject.paymybuddy.backend.service.IUserAccountService;
 import com.openclassroomsproject.paymybuddy.configuration.security.SecurityProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,20 +12,33 @@ import java.util.Optional;
 @Service
 public class UserAccountServiceImpl implements IUserAccountService {
     private final UserAccountRepository userAccountRepository;
+    private final IAuthoritiesService authoritiesService;
     private SecurityProvider securityProvider;
 
-    public UserAccountServiceImpl(SecurityProvider securityProvider, UserAccountRepository userAccountRepository) {
+    public UserAccountServiceImpl(SecurityProvider securityProvider, UserAccountRepository userAccountRepository, IAuthoritiesService authoritiesService) {
         this.userAccountRepository = userAccountRepository;
         this.securityProvider = securityProvider;
+        this.authoritiesService = authoritiesService;
     }
 
     @Override
-    public void createUserAccount(UserAccount userAccount) {
-        String passwordNotEncrypted = userAccount.getPassword();
-        userAccount.setPassword(new BCryptPasswordEncoder().encode(passwordNotEncrypted));
-        userAccount.setActivated(true);
-        userAccountRepository.save(userAccount);
-        // TODO create role_user
+    public void adminAccountProvision(double amount) {
+        UserAccount adminAccount = findUserAccountByEmail("admin@admin.com");
+        adminAccount.setBalance(adminAccount.getBalance() +amount);
+        userAccountRepository.save(adminAccount);
+    }
+
+    @Override
+    public boolean createUserAccount(UserAccount userAccount) {
+        try {
+            String passwordNotEncrypted = userAccount.getPassword();
+            userAccount.setPassword(new BCryptPasswordEncoder().encode(passwordNotEncrypted));
+            userAccount.setActivated(true);
+            userAccountRepository.save(userAccount);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -34,52 +47,24 @@ public class UserAccountServiceImpl implements IUserAccountService {
     }
 
     @Override
-    public double getAccountBalance() {
+    public UserAccount findUserAccountByEmail(String email) {
         UserAccount userAccount = new UserAccount();
-        String userAccountEmail = securityProvider.getAuthenticatedUser().getUsername();
-        Optional<UserAccount> OptionalUserAccount = userAccountRepository.findUserAccountByEmail(userAccountEmail);
-        if (OptionalUserAccount.isPresent()) {
-            userAccount = OptionalUserAccount.get();
+        Optional<UserAccount> optionalUserAccount = userAccountRepository.findUserAccountByEmail(email);
+        if (optionalUserAccount.isPresent()) {
+            userAccount = optionalUserAccount.get();
         }
-        return userAccount.getBalance();
+        return userAccount;
     }
 
     @Override
-    public boolean updateUsersAccountsBeforeSavingTheTransaction(VisibleBuddyTransaction visiBleBuddyTransaction, boolean isARollback) {
-        try {
-            double transmitterAmountAfterModification;
-            double beneficiaryAmountAfterModification;
-            double amount = visiBleBuddyTransaction.getAmount();
-            String transmitterEmail = securityProvider.getAuthenticatedUser().getUsername();
-            String beneficiaryEmail = visiBleBuddyTransaction.getConnexionEmail();
-            Optional<UserAccount> transmitterAccount = userAccountRepository.findUserAccountByEmail(transmitterEmail);
-            Optional<UserAccount> beneficiaryAccount = userAccountRepository.findUserAccountByEmail(beneficiaryEmail);
-            if (transmitterAccount.isPresent()) {
-                UserAccount transmitterAccountUpdated = transmitterAccount.get();
-                double transmitterAmountBeforeModification = transmitterAccountUpdated.getBalance();
-                if (isARollback){
-                    transmitterAmountAfterModification = transmitterAmountBeforeModification + amount;
-                } else {
-                    transmitterAmountAfterModification = transmitterAmountBeforeModification - amount;
-                }
-                transmitterAccountUpdated.setBalance(transmitterAmountAfterModification);
-                userAccountRepository.save(transmitterAccountUpdated);
-            }
-            if (beneficiaryAccount.isPresent()) {
-                UserAccount beneficiaryAccountUpdated = beneficiaryAccount.get();
-                double beneficiaryAmountBeforeModification = beneficiaryAccountUpdated.getBalance();
-                if (!isARollback) {
-                    beneficiaryAmountAfterModification = beneficiaryAmountBeforeModification - amount;
-                } else {
-                    beneficiaryAmountAfterModification = beneficiaryAmountBeforeModification + amount;
-                }
-                beneficiaryAccountUpdated.setBalance(beneficiaryAmountAfterModification);
-                userAccountRepository.save(beneficiaryAccountUpdated);
-            }
-            return true;
-        } catch (Exception e) {
-            return false;
+    public double getAccountBalance() {
+        UserAccount userAccount = new UserAccount();
+        String userAccountEmail = securityProvider.getAuthenticatedUser().getUsername();
+        Optional<UserAccount> optionalUserAccount = userAccountRepository.findUserAccountByEmail(userAccountEmail);
+        if (optionalUserAccount.isPresent()) {
+            userAccount = optionalUserAccount.get();
         }
+        return userAccount.getBalance();
     }
 
     @Override
@@ -99,13 +84,13 @@ public class UserAccountServiceImpl implements IUserAccountService {
     }
 
     @Override
-    public boolean isUserBalanceSufficient(int amountRequestedInt) {
+    public boolean isUserBalanceSufficient(double amountRequested) {
         String userAccountEmail = securityProvider.getAuthenticatedUser().getUsername();
         Optional<UserAccount> optionalUserAccount = userAccountRepository.findUserAccountByEmail(userAccountEmail);
         if (optionalUserAccount.isPresent()) {
             UserAccount userAccount = optionalUserAccount.get();
             double amountAvailable = userAccount.getBalance();
-            return amountAvailable > (double) amountRequestedInt || amountAvailable == (double) amountRequestedInt;
+            return amountAvailable > amountRequested || amountAvailable == amountRequested;
         }
         return false;
     }

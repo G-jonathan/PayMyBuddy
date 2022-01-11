@@ -50,8 +50,8 @@ public class ConnexionServiceImpl implements IConnexionService {
     @Override
     public List<String> findAllConnexionByUserAccountEmail() {
         String email = securityProvider.getAuthenticatedUser().getUsername();
-        List<Connexion> connexionList = connexionRepository.findAllConnexionByUserAccountEmail(email);
         List<String> emailConnectionList = new ArrayList<>();
+        List<Connexion> connexionList = connexionRepository.findAllConnexionByUserAccountEmail(email);
         for (Connexion connexion : connexionList) {
             emailConnectionList.add(connexion.getConnexionEmail());
         }

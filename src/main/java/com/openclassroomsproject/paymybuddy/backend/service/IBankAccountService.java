@@ -5,11 +5,15 @@ import java.util.List;
 
 public interface IBankAccountService {
 
-    void addBankAccount(BankAccount bankAccount);
+    BankAccount findBankAccountByUserAccountEmail();
 
-    List<BankAccount> findBankAccountsByUserAccountEmail(String userAccountEmail);
+    boolean addBankAccount(BankAccount bankAccount);
+
+    boolean checkIfUserHasRegisteredABankAccount();
+
+    List<BankAccount> findBankAccountsByUserAccountEmail();
 
     void updateBankAccount(BankAccount bankAccount);
 
-    void deleteABankAccount(BankAccount bankAccount);
+    void deleteABankAccount();
 }

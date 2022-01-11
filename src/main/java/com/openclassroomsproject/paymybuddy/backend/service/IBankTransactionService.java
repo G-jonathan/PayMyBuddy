@@ -1,12 +1,11 @@
 package com.openclassroomsproject.paymybuddy.backend.service;
 
-import com.openclassroomsproject.paymybuddy.backend.model.BankTransaction;
+import com.openclassroomsproject.paymybuddy.backend.model.VisibleBuddyTransaction;
 import java.util.List;
 
 public interface IBankTransactionService {
 
-    void addBankTransaction(BankTransaction bankTransaction);
+    boolean addBankTransaction(VisibleBuddyTransaction visibleBuddyTransaction);
 
-    List<BankTransaction> findAllBankTransactionByUserAccountEmail(String userAccountEmail);
-
+    List<VisibleBuddyTransaction> findAllBankTransactionUser();
 }

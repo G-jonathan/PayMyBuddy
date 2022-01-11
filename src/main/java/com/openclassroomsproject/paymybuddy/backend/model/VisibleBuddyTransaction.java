@@ -9,6 +9,7 @@ public class VisibleBuddyTransaction {
     private String description;
     private LocalDate date;
     private String connexionEmail;
+    private double charges;
 
     public int getId() {
         return id;
@@ -48,5 +49,13 @@ public class VisibleBuddyTransaction {
 
     public void setConnexionEmail(String connexionEmail) {
         this.connexionEmail = connexionEmail;
+    }
+
+    public double getCharges() {
+        return charges;
+    }
+
+    public void setCharges(double charges) {
+        this.charges = charges;
     }
 }

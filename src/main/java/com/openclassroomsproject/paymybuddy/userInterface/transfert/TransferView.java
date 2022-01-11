@@ -1,9 +1,7 @@
 package com.openclassroomsproject.paymybuddy.userInterface.transfert;
 
 import com.openclassroomsproject.paymybuddy.backend.model.VisibleBuddyTransaction;
-import com.openclassroomsproject.paymybuddy.backend.service.IBuddyTransactionService;
-import com.openclassroomsproject.paymybuddy.backend.service.IConnexionService;
-import com.openclassroomsproject.paymybuddy.backend.service.IUserAccountService;
+import com.openclassroomsproject.paymybuddy.backend.service.*;
 import com.openclassroomsproject.paymybuddy.userInterface.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -16,11 +14,14 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Route (value = "transfer", layout = MainLayout.class)
 @PageTitle("Transfer page of PayMyBuddy application")
@@ -31,21 +32,25 @@ import java.util.List;
 public class TransferView extends VerticalLayout {
 
     private final IBuddyTransactionService buddyTransactionService;
+    private final IBankTransactionService bankTransactionService;
     private final IConnexionService connexionService;
     private final IUserAccountService userAccountService;
+    private final IBankAccountService bankAccountService;
     Grid<VisibleBuddyTransaction> buddyTransactionGrid = new Grid<>(VisibleBuddyTransaction.class, false);
     ComboBox<String> selectAConnexionComboBox = new ComboBox<>();
-    IntegerField integerField = new IntegerField();
+    NumberField numberField = new NumberField();
     final String SEND_MONEY_AND_ADD_CONNECTION_TEXT = "Send Money";
     final String MY_TRANSACTION_TEXT = "My Transactions";
     final String SEND_MONEY_AND_ADD_CONNECTION_BUTTON_TEXT = "Add Connexion";
     final String COMBO_BOX_PLACEHOLDER = "Select Connection";
     final String BUTTON_PAY_TEXT = "Pay";
 
-    public TransferView(IBuddyTransactionService buddyTransactionService, IConnexionService connexionService, IUserAccountService userAccountService) {
+    public TransferView(IBuddyTransactionService buddyTransactionService, IBankTransactionService bankTransactionService, IConnexionService connexionService, IUserAccountService userAccountService, IBankAccountService bankAccountService) {
         this.buddyTransactionService = buddyTransactionService;
+        this.bankTransactionService = bankTransactionService;
         this.connexionService = connexionService;
         this.userAccountService = userAccountService;
+        this.bankAccountService = bankAccountService;
         addClassName("transfer-view");
         setSizeFull();
         configureBuddyTransactionGrid();
@@ -68,7 +73,7 @@ public class TransferView extends VerticalLayout {
         stylizeButtonPay(buttonPay);
         Span myTransactionsSpan = new Span(MY_TRANSACTION_TEXT);
         stylizeMyTransactions(myTransactionsSpan);
-        selectAConnexionAndPay.add(selectAConnexionComboBox, integerField, buttonPay);
+        selectAConnexionAndPay.add(selectAConnexionComboBox, numberField, buttonPay);
         add(sendMoneyAndAddConnexion, selectAConnexionAndPay, myTransactionsSpan, buddyTransactionGrid);
         updateTransactionsGrid();
         updateComboBox();
@@ -134,12 +139,12 @@ public class TransferView extends VerticalLayout {
     }
 
     public void configureAndStylizeIntegerField() {
-        integerField.setStep(1);
-        integerField.setValue(0);
-        integerField.setHasControls(true);
-        integerField.setMin(0);
-        integerField.setMax(100);
-        integerField
+        numberField.setStep(1);
+        numberField.setValue(1.0);
+        numberField.setHasControls(true);
+        numberField.setMin(1);
+        numberField.setMax(100);
+        numberField
                 .getElement()
                 .getStyle()
                 .set("background-color", "white")
@@ -167,6 +172,12 @@ public class TransferView extends VerticalLayout {
                 .set("font-weight", "bold")
                 .set("color", "white")
                 .set("font-size", "large");
+        Span fifthSpan = new Span("Charges");
+        fifthSpan
+                .getStyle()
+                .set("font-weight", "bold")
+                .set("color", "white")
+                .set("font-size", "large");
         buddyTransactionGrid
                 .getStyle()
                 .set("border", "2px solid black")
@@ -175,6 +186,7 @@ public class TransferView extends VerticalLayout {
         buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getConnexionEmail).setHeader(firstSpan);
         buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getDescription).setHeader(secondSpan);
         buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getAmount).setHeader(thirdSpan);
+        buddyTransactionGrid.addColumn(VisibleBuddyTransaction::getCharges).setHeader(fifthSpan);
     }
 
     public void configureSelectAConnexionComboBox() {
@@ -188,45 +200,44 @@ public class TransferView extends VerticalLayout {
     }
 
     private void updateTransactionsGrid() {
-        List<VisibleBuddyTransaction> visibleBuddyTransactionList =buddyTransactionService.findAllUserBuddyTransactions();
-        buddyTransactionGrid.setItems(visibleBuddyTransactionList);
+        List<VisibleBuddyTransaction> visibleBuddyTransactionList = buddyTransactionService.findAllUserBuddyTransactions();
+        List<VisibleBuddyTransaction> visibleTransactionList = bankTransactionService.findAllBankTransactionUser();
+        List<VisibleBuddyTransaction> gridList = new ArrayList<>();
+        gridList = Stream.concat(visibleBuddyTransactionList.stream(), visibleTransactionList.stream()).collect(Collectors.toList());
+        buddyTransactionGrid.setItems(gridList);
     }
 
     private void updateComboBox() {
-        selectAConnexionComboBox.setItems(connexionService.findAllConnexionByUserAccountEmail());
+        boolean accountAlreadyRegistered = bankAccountService.checkIfUserHasRegisteredABankAccount();
+        if (accountAlreadyRegistered) {
+            List<String> comboBoxStringList = new ArrayList<>();
+            comboBoxStringList.add("BANK WITHDRAWAL");
+            comboBoxStringList.add("BANK DEPOSIT");
+            List<String> connexionEmailList = connexionService.findAllConnexionByUserAccountEmail();
+            comboBoxStringList.addAll(connexionEmailList);
+            selectAConnexionComboBox.setItems(comboBoxStringList);
+        } else {
+            selectAConnexionComboBox.setItems(connexionService.findAllConnexionByUserAccountEmail());
+        }
     }
 
     private void buttonPayValidation() {
-        amountValidation();
-        if (amountValidation()) {
-            VisibleBuddyTransaction transaction = new VisibleBuddyTransaction();
-            transaction.setConnexionEmail(selectAConnexionComboBox.getValue());
-            transaction.setAmount(integerField.getValue());
-            transaction.setDate(LocalDate.now());
-            boolean result = buddyTransactionService.addBuddyTransaction(transaction);
-            if (result) {
-                Notification notificationSuccess = Notification.show("Successful transaction !");
-                notificationSuccess.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            } else {
-                Notification notificationError = Notification.show("Transaction canceled, an error has occurred");
-                notificationError.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-        }
-    }
-
-    private boolean amountValidation() {
-        int amount = integerField.getValue();
-        if (amount == 0) {
-            Notification notificationAmountCantBe0 = Notification.show("Amount can't be 0");
-            notificationAmountCantBe0.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            return false;
-        }
-        if (userAccountService.isUserBalanceSufficient(amount)) {
-            return true;
+        boolean result;
+        VisibleBuddyTransaction transaction = new VisibleBuddyTransaction();
+        transaction.setConnexionEmail(selectAConnexionComboBox.getValue());
+        transaction.setAmount(numberField.getValue());
+        transaction.setDate(LocalDate.now());
+        if (selectAConnexionComboBox.getValue().equals("BANK WITHDRAWAL") || selectAConnexionComboBox.getValue().equals("BANK DEPOSIT")) {
+             result = bankTransactionService.addBankTransaction(transaction);
         } else {
-            Notification notificationBalanceInsufficient = Notification.show("your balance is insufficient");
-            notificationBalanceInsufficient.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            return false;
+             result = buddyTransactionService.addBuddyTransaction(transaction);
+        }
+        if (result) {
+            Notification notificationSuccess = Notification.show("Successful transaction !");
+            notificationSuccess.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        } else {
+            Notification notificationError = Notification.show("Transaction canceled, an error has occurred --> balance insufficient or amount can't be 0");
+            notificationError.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 }
